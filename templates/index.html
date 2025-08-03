@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Court Data Fetcher</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --color-bg-light: #ffffff;
+      --color-bg-dark: #121212;
+
+      --color-card-light: #f5f5f5;
+      --color-card-dark: #1e1e1e;
+
+      --color-border-light: #d4d4d4;
+      --color-border-dark: #2e2e2e;
+
+      --color-text-light: #1a1a1a;
+      --color-text-dark: #f5f5f5;
+
+      --color-label-light: #6e6e6e;
+      --color-label-dark: #a9a9a9;
+
+      --color-btn-bg-light: #333333;
+      --color-btn-bg-dark: #e0e0e0;
+
+      --color-btn-hover-light: #4d4d4d;
+      --color-btn-hover-dark: #cfcfcf;
+
+      --color-btn-text-light: #ffffff;
+      --color-btn-text-dark: #121212;
+
+      --color-shadow-light: 0 4px 12px rgba(0, 0, 0, 0.05);
+      --color-shadow-dark: 0 4px 12px rgba(0, 0, 0, 0.4);
+
+      --color-link-light: #444444;
+      --color-link-dark: #dddddd;
+    }
+
+    html, body {
+      height: 100%;
+    }
+    body {
+      background: var(--color-bg-light);
+      color: var(--color-text-light);
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      /* Move content a little above the center */
+      justify-content: flex-start;
+      transition: background 0.3s, color 0.3s;
+    }
+    /* Add a wrapper to vertically position content above center */
+    .content-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      /* Push content down a bit from the top, but above center */
+      margin-top: 8vh;
+      margin-bottom: auto;
+    }
+    body.dark {
+      background: var(--color-bg-dark);
+      color: var(--color-text-dark);
+    }
+    .theme-toggle {
+      position: fixed;
+      top: 18px;
+      right: 24px;
+      z-index: 100;
+      background: none;
+      border: none;
+      font-size: 1.3rem;
+      cursor: pointer;
+      color: var(--color-link-light);
+      background-color: transparent;
+      transition: color 0.2s;
+    }
+    body.dark .theme-toggle {
+      color: var(--color-link-dark);
+    }
+    h2 {
+      color: var(--color-text-light);
+      margin-bottom: 28px;
+      letter-spacing: 1px;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 700;
+      transition: color 0.3s;
+      margin-top: 0;
+    }
+    body.dark h2 {
+      color: var(--color-text-dark);
+    }
+    form {
+      background: var(--color-card-light);
+      padding: 36px 32px 28px 32px;
+      border-radius: 14px;
+      box-shadow: var(--color-shadow-light);
+      min-width: 320px;
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-end;
+      gap: 22px;
+      border: 1px solid var(--color-border-light);
+      transition: background 0.3s, box-shadow 0.3s, border 0.3s;
+      flex-wrap: wrap;
+    }
+    body.dark form {
+      background: var(--color-card-dark);
+      box-shadow: var(--color-shadow-dark);
+      border: 1px solid var(--color-border-dark);
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      min-width: 160px;
+      flex: 1 1 0;
+    }
+    .form-row {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      gap: 22px;
+    }
+    .button-row {
+      display: flex;
+      width: 100%;
+      justify-content: center;
+      margin-top: 10px;
+    }
+    label {
+      font-weight: 500;
+      color: var(--color-label-light);
+      margin-bottom: 7px;
+      display: block;
+      white-space: nowrap;
+      font-size: 1.04rem;
+      letter-spacing: 0.2px;
+      transition: color 0.3s;
+    }
+    body.dark label {
+      color: var(--color-label-dark);
+    }
+    select, input[type="text"] {
+      width: 100%;
+      padding: 10px 13px;
+      border: 1px solid var(--color-border-light);
+      border-radius: 7px;
+      font-size: 1.04rem;
+      background: #f9fafb;
+      margin-bottom: 2px;
+      transition: border-color 0.2s, background 0.3s, color 0.3s;
+      box-sizing: border-box;
+      color: var(--color-text-light);
+    }
+    body.dark select, body.dark input[type="text"] {
+      background: #23272b;
+      border: 1px solid var(--color-border-dark);
+      color: var(--color-text-dark);
+    }
+    select:focus, input[type="text"]:focus {
+      border-color: var(--color-btn-bg-light);
+      outline: none;
+      background: #fff;
+    }
+    body.dark select:focus, body.dark input[type="text"]:focus {
+      border-color: var(--color-btn-bg-dark);
+      background: #23272b;
+    }
+    button[type="submit"] {
+      background: var(--color-btn-bg-light);
+      color: var(--color-btn-text-light);
+      border: none;
+      padding: 12px 32px;
+      border-radius: 7px;
+      font-size: 1.12rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 0;
+      transition: background 0.18s, color 0.18s;
+      box-shadow: 0 2px 8px rgba(0,123,255,0.08);
+      height: 48px;
+      white-space: nowrap;
+      letter-spacing: 0.5px;
+      align-self: center;
+    }
+    button[type="submit"]:hover {
+      background: var(--color-btn-hover-light);
+    }
+    body.dark button[type="submit"] {
+      background: var(--color-btn-bg-dark);
+      color: var(--color-btn-text-dark);
+    }
+    body.dark button[type="submit"]:hover {
+      background: var(--color-btn-hover-dark);
+    }
+    @media (max-width: 900px) {
+      form {
+        flex-direction: column;
+        min-width: unset;
+        max-width: 400px;
+        width: 95vw;
+        padding: 22px 6vw 18px 6vw;
+        gap: 18px;
+      }
+      .form-row {
+        flex-direction: column;
+        gap: 18px;
+      }
+      .button-row {
+        margin-top: 12px;
+      }
+      button[type="submit"] {
+        width: 100%;
+        align-self: stretch;
+      }
+      .content-wrapper {
+        margin-top: 4vh;
+      }
+    }
+    /* Extra: subtle input shadow and focus */
+    select, input[type="text"] {
+      box-shadow: 0 1px 2px rgba(44,62,80,0.03);
+    }
+    select:focus, input[type="text"]:focus {
+      box-shadow: 0 2px 8px rgba(0,123,255,0.10);
+    }
+    /* Theme toggle button hover */
+    .theme-toggle:hover {
+      color: var(--color-btn-hover-light);
+    }
+    body.dark .theme-toggle:hover {
+      color: var(--color-btn-hover-dark);
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" id="theme-toggle-btn" aria-label="Toggle dark/light mode">
+    <span id="theme-icon" style="font-size:1.3em;vertical-align:middle;">🌙</span>
+  </button>
+  <div class="content-wrapper">
+    <h2>
+      <span style="vertical-align: middle;">Search Delhi High Court Case</span>
+      <span aria-label="magnifying glass" role="img" style="font-size:1.1em;vertical-align:middle;">🔎</span>
+    </h2>
+    <form method="post" autocomplete="off">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="case_type">Case Type:</label>
+          <select name="case_type" id="case_type" required>
+            <option value="">Select Case Type</option>
+            {% for ct in case_types %}
+              <option value="{{ ct }}">{{ ct }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="case_number">Case Number:</label>
+          <input type="text" name="case_number" id="case_number" required placeholder="e.g. 1234">
+        </div>
+        <div class="form-group">
+          <label for="filing_year">Filing Year:</label>
+          <select name="filing_year" id="filing_year" required>
+            <option value="">Select Filing Year</option>
+            {% for year in case_years %}
+              <option value="{{ year }}">{{ year }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="button-row">
+        <button type="submit">Fetch</button>
+      </div>
+    </form>
+  </div>
+  <script>
+    // Theme toggle logic
+    function setTheme(dark) {
+      if (dark) {
+        document.body.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.body.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+      updateThemeIcon();
+    }
+    function updateThemeIcon() {
+      var icon = document.getElementById('theme-icon');
+      if (document.body.classList.contains('dark')) {
+        icon.textContent = '☀️';
+      } else {
+        icon.textContent = '🌙';
+      }
+    }
+    document.getElementById('theme-toggle-btn').addEventListener('click', function() {
+      setTheme(!document.body.classList.contains('dark'));
+    });
+    // On load, set theme from localStorage or system preference
+    document.addEventListener('DOMContentLoaded', function() {
+      let theme = localStorage.getItem('theme');
+      if (!theme) {
+        theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      setTheme(theme === 'dark');
+    });
+    // Also update icon if theme is changed by other means
+    const observer = new MutationObserver(updateThemeIcon);
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  </script>
+</body>
+</html>
