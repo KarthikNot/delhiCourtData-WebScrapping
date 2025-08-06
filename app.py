@@ -1,9 +1,12 @@
-import requests
+import requests, json
 from flask import Flask, render_template, request
 from webScraper.courtScraper import fetch_case_data
+from database.models import Base, engine, SessionLocal, QueryLog
 from bs4 import BeautifulSoup
 
 app = Flask(__name__)
+
+Base.metadata.create_all(bind=engine)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -12,8 +15,18 @@ def index():
         case_number = request.form['case_number']
         filing_year = request.form['filing_year']
 
+        session = SessionLocal()
+
         try:
             result = fetch_case_data(case_type, case_number, filing_year)
+
+            query_text = f"{case_type}/{case_number}/{filing_year}"
+            raw_response = json.dumps(result['data'])
+
+            log_entry = QueryLog(query_text=query_text, raw_response=raw_response)
+            session.add(log_entry)
+            session.commit()
+
             return render_template('result.html', data=result["data"])
         except Exception as e:
             return render_template('result.html', error=str(e))

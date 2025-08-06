@@ -109,6 +109,104 @@
     body.dark h3 {
       color: var(--color-text-dark);
     }
+    /* Download dropdown styles */
+    .download-dropdown {
+      position: relative;
+      display: inline-block;
+      margin: 0 0 24px 0;
+    }
+    .download-btn-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-btn-bg-light);
+      color: var(--color-btn-text-light);
+      border-radius: 7px;
+      font-size: 1.05rem; /* was 1.25rem */
+      font-weight: 600;
+      text-decoration: none;
+      box-shadow: 0 2px 8px rgba(0,123,255,0.08);
+      transition: background 0.18s, color 0.18s;
+      border: none;
+      cursor: pointer;
+      padding: 6px 12px 6px 10px; /* was 10px 18px 10px 16px */
+      min-width: 32px; /* was 48px */
+      min-height: 32px; /* was 44px */
+      gap: 8px; /* was 8px */
+      position: relative;
+    }
+    .download-btn-icon:hover, .download-btn-icon:focus {
+      background: var(--color-btn-hover-light);
+      color: var(--color-btn-text-light);
+      text-decoration: none;
+    }
+    body.dark .download-btn-icon {
+      background: var(--color-btn-bg-dark);
+      color: var(--color-btn-text-dark);
+    }
+    body.dark .download-btn-icon:hover, body.dark .download-btn-icon:focus {
+      background: var(--color-btn-hover-dark);
+      color: var(--color-btn-text-dark);
+    }
+    .download-btn-icon svg {
+      margin-right: 4px; /* was 6px */
+      font-size: 1em; /* was 1.2em */
+      vertical-align: middle;
+    }
+    .download-caret {
+      margin-left: 4px;
+      font-size: 1em;
+      vertical-align: middle;
+      pointer-events: none;
+    }
+    .download-options {
+      display: none;
+      position: absolute;
+      left: 0;
+      top: 110%;
+      min-width: 170px;
+      background: var(--color-card-light);
+      color: var(--color-text-light);
+      border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+      z-index: 10;
+      padding: 6px 0;
+      border: 1px solid var(--color-border-light);
+      font-size: 1.05rem;
+      transition: background 0.3s, color 0.3s;
+    }
+    .download-dropdown.open .download-options {
+      display: block;
+    }
+    .download-option {
+      width: 100%;
+      background: none;
+      border: none;
+      color: inherit;
+      text-align: left;
+      padding: 8px 14px; /* was 10px 18px */
+      font-size: 0.98rem; /* was 1.05rem */
+      cursor: pointer;
+      transition: background 0.18s, color 0.18s;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 6px; /* was 8px */
+    }
+    .download-option:hover, .download-option:focus {
+      background: var(--color-table-row-hover-light);
+      color: var(--color-link-hover-light);
+      outline: none;
+    }
+    body.dark .download-options {
+      background: var(--color-card-dark);
+      color: var(--color-text-dark);
+      border-color: var(--color-border-dark);
+    }
+    body.dark .download-option:hover, body.dark .download-option:focus {
+      background: var(--color-table-row-hover-dark);
+      color: var(--color-link-hover-dark);
+    }
     table {
       border-collapse: collapse;
       width: 90vw;
@@ -273,6 +371,7 @@
       td:nth-of-type(3):before { content: "Order Date"; }
       td:nth-of-type(4):before { content: "Corrigendum"; }
       td:nth-of-type(5):before { content: "Hindi Order"; }
+      td:nth-of-type(6):before { content: "Case Link"; }
     }
     /* Scrollbar styling for dark mode */
     body.dark ::-webkit-scrollbar {
@@ -282,6 +381,38 @@
     body.dark ::-webkit-scrollbar-thumb {
       background: #353a40;
       border-radius: 6px;
+    }
+
+    /* New styles for wrapping div and download button positioning */
+    .table-download-wrapper {
+      position: relative;
+      width: 90vw;
+      max-width: 900px;
+      margin: 0 auto 32px auto;
+      /* To match table width and centering */
+    }
+    @media (max-width: 900px) {
+      .table-download-wrapper {
+        width: 98vw;
+      }
+    }
+    .table-download-wrapper .download-dropdown {
+      position: absolute;
+      top: 0;
+      right: 0;
+      margin: 0;
+      z-index: 2;
+    }
+    @media (max-width: 600px) {
+      .table-download-wrapper {
+        width: 100vw;
+        max-width: 100vw;
+        min-width: 0;
+      }
+      .table-download-wrapper .download-dropdown {
+        right: 8px;
+        top: 0;
+      }
     }
   </style>
   <script>
@@ -346,34 +477,227 @@
       <span style="vertical-align: middle;">Case Orders</span>
       <span aria-label="document" role="img" style="font-size:1.3em;vertical-align:middle;">📄</span>
     </h3>
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Case Number</th>
-          <th>Order Date</th>
-          <th>Corrigendum</th>
-          <th>Hindi Order</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for case in data %}
-        <tr>
-          <td>{{ loop.index }}</td>
-          <td>{{ case.case_no_order_link | safe }}</td>
-          <td>{{ case.order_date.display }}</td>
-          <td>{{ case.corrigendum or 'N/A' }}</td>
-          <td>
-            {% if case.hindi_order %}
-              <a href="{{ case.hindi_order }}" target="_blank" rel="noopener">View PDF</a>
-            {% else %}
-              N/A
-            {% endif %}
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="table-download-wrapper">
+      <div class="download-dropdown" id="downloadDropdown">
+        <button class="download-btn-icon" id="downloadDropdownBtn" aria-haspopup="true" aria-expanded="false" title="Download" aria-label="Download">
+          <svg width="1em" height="1em" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
+            <path d="M10 2a1 1 0 0 1 1 1v8.586l2.293-2.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4A1 1 0 1 1 6.707 9.293L9 11.586V3a1 1 0 0 1 1-1z"/>
+            <path d="M4 15a1 1 0 0 1 1-1h10a1 1 0 1 1 0 2H5a1 1 0 0 1-1-1z"/>
+          </svg>
+        </button>
+        <div class="download-options" id="downloadOptions" role="menu" aria-label="Download options">
+          <button class="download-option" role="menuitem" tabindex="0" onclick="downloadTable('csv')">
+            <svg width="0.9em" height="0.9em" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" style="margin-right:3px;">
+              <path d="M17 3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14zm0 2H3v10h14V5zm-9.5 2a.5.5 0 0 1 .5.5V13a.5.5 0 0 1-1 0V7.5A.5.5 0 0 1 7.5 7zm2.5.5a.5.5 0 0 1 1 0V13a.5.5 0 0 1-1 0V7.5zm3 .5a.5.5 0 0 1 .5.5V13a.5.5 0 0 1-1 0V8.5a.5.5 0 0 1 .5-.5z"/>
+            </svg>
+            CSV
+          </button>
+          <button class="download-option" role="menuitem" tabindex="0" onclick="downloadTable('xlsx')">
+            <svg width="0.9em" height="0.9em" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" style="margin-right:3px;">
+              <path d="M17 3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14zm0 2H3v10h14V5zm-7.5 2.5a.5.5 0 0 1 .5.5v1.793l1.146-1.147a.5.5 0 1 1 .708.708L10.707 10l1.147 1.146a.5.5 0 0 1-.708.708L10 10.707l-1.146 1.147a.5.5 0 1 1-.708-.708L9.293 10l-1.147-1.146a.5.5 0 1 1 .708-.708L10 9.293V7.5a.5.5 0 0 1 .5-.5z"/>
+            </svg>
+            Excel
+          </button>
+        </div>
+      </div>
+      <table id="result-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Case Number</th>
+            <th>Order Date</th>
+            <th>Corrigendum</th>
+            <th>Hindi Order</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for case in data %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td data-raw="{{ case.case_no_order_link | striptags | e }}">{{ case.case_no_order_link | safe }}</td>
+            <td>{{ case.order_date.display }}</td>
+            <td>{{ case.corrigendum or 'N/A' }}</td>
+            <td>
+              {% if case.hindi_order %}
+                <a href="{{ case.hindi_order }}" target="_blank" rel="noopener">View PDF</a>
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <script>
+      // Download dropdown logic
+      (function() {
+        var dropdown = document.getElementById('downloadDropdown');
+        var btn = document.getElementById('downloadDropdownBtn');
+        var options = document.getElementById('downloadOptions');
+        var open = false;
+
+        function closeDropdown() {
+          dropdown.classList.remove('open');
+          btn.setAttribute('aria-expanded', 'false');
+          open = false;
+        }
+        function openDropdown() {
+          dropdown.classList.add('open');
+          btn.setAttribute('aria-expanded', 'true');
+          open = true;
+        }
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (open) {
+            closeDropdown();
+          } else {
+            openDropdown();
+          }
+        });
+        btn.addEventListener('keydown', function(e) {
+          if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openDropdown();
+            var firstOption = options.querySelector('.download-option');
+            if (firstOption) firstOption.focus();
+          }
+        });
+        // Keyboard navigation for options
+        var optionButtons = options.querySelectorAll('.download-option');
+        optionButtons.forEach(function(opt, idx) {
+          opt.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowDown') {
+              e.preventDefault();
+              if (idx < optionButtons.length - 1) optionButtons[idx + 1].focus();
+              else optionButtons[0].focus();
+            } else if (e.key === 'ArrowUp') {
+              e.preventDefault();
+              if (idx > 0) optionButtons[idx - 1].focus();
+              else optionButtons[optionButtons.length - 1].focus();
+            } else if (e.key === 'Escape') {
+              closeDropdown();
+              btn.focus();
+            }
+          });
+        });
+        // Close dropdown on outside click
+        document.addEventListener('mousedown', function(e) {
+          if (!dropdown.contains(e.target)) {
+            closeDropdown();
+          }
+        });
+        // Close dropdown on Escape
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape') {
+            closeDropdown();
+          }
+        });
+      })();
+
+      // Helper to get cell value, stripping HTML for links
+      function getCellText(cell) {
+        // If cell has a data-raw attribute, use it (for case number)
+        if (cell.hasAttribute && cell.hasAttribute('data-raw')) {
+          return cell.getAttribute('data-raw');
+        }
+        // If cell contains a link, get the text or href
+        var link = cell.querySelector && cell.querySelector('a');
+        if (link) {
+          // For Hindi Order, use the href if present, else text
+          if (link.textContent.trim() === "View PDF" && link.href) {
+            return link.href;
+          }
+          return link.textContent.trim();
+        }
+        // Otherwise, just get the text
+        return cell.textContent.trim();
+      }
+
+      function tableToArray(table) {
+        var arr = [];
+        var headers = [];
+        var ths = table.querySelectorAll('thead th');
+        for (var i = 0; i < ths.length; i++) {
+          headers.push(ths[i].textContent.trim());
+        }
+        arr.push(headers);
+        var trs = table.querySelectorAll('tbody tr');
+        for (var i = 0; i < trs.length; i++) {
+          var row = [];
+          var tds = trs[i].querySelectorAll('td');
+          for (var j = 0; j < tds.length; j++) {
+            // For the "Case Link" column, always extract the link
+            if (tds[j].hasAttribute && tds[j].hasAttribute('data-link')) {
+              row.push(getCaseLink(tds[j]));
+            } else {
+              row.push(getCellText(tds[j]));
+            }
+          }
+          arr.push(row);
+        }
+        return arr;
+      }
+
+      function arrayToCSV(arr) {
+        return arr.map(function(row) {
+          return row.map(function(cell) {
+            var s = String(cell).replace(/"/g, '""');
+            if (s.search(/("|,|\n)/g) >= 0) {
+              s = '"' + s + '"';
+            }
+            return s;
+          }).join(',');
+        }).join('\r\n');
+      }
+
+      function downloadCSV(arr, filename) {
+        var csv = arrayToCSV(arr);
+        var blob = new Blob([csv], {type: 'text/csv'});
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function() {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 100);
+      }
+
+      // Excel (xlsx) download using SheetJS (CDN)
+      function downloadXLSX(arr, filename) {
+        if (typeof XLSX === 'undefined') {
+          alert('Excel export library not loaded.');
+          return;
+        }
+        var ws = XLSX.utils.aoa_to_sheet(arr);
+        var wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Orders");
+        XLSX.writeFile(wb, filename);
+      }
+
+      function downloadTable(type) {
+        var table = document.getElementById('result-table');
+        var arr = tableToArray(table);
+        if (type === 'csv') {
+          downloadCSV(arr, 'case_orders.csv');
+        } else if (type === 'xlsx') {
+          if (typeof XLSX === 'undefined') {
+            // Load SheetJS dynamically if not loaded
+            var script = document.createElement('script');
+            script.src = "https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js";
+            script.onload = function() {
+              downloadXLSX(arr, 'case_orders.xlsx');
+            };
+            document.body.appendChild(script);
+          } else {
+            downloadXLSX(arr, 'case_orders.xlsx');
+          }
+        }
+      }
+    </script>
   {% endif %}
   <a href="/" class="back-link">🔍 Search Another</a>
 </body>

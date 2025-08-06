@@ -1,6 +1,5 @@
 import requests, re, sys
 from bs4 import BeautifulSoup
-from utils.exception import CustomException
 
 def fetch_case_data(case_type, case_number, filing_year):
     try:
@@ -94,4 +93,5 @@ def fetch_case_data(case_type, case_number, filing_year):
 
         return 'done'
     except Exception as e:
-        raise CustomException(e, sys)
+        print(str(e))
+        raise e
