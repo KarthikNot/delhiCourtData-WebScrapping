@@ -37,7 +37,7 @@ This project is a web application for fetching case details from the **Delhi Hig
 
 4. **Run the Application**
    ```bash
-   flask run
+   flask run --debug
    ```
    The app will be available at [http://localhost:5000](http://localhost:5000).
 
